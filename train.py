@@ -7,10 +7,8 @@ from torch.nn import MSELoss
 from torch.utils.data import DataLoader
 from conv_network import Network
 from data import SlsDataset
-from sacred import Experiment
 from utils import split_train_val, plot_loss
 
-ex = Experiment("SLS-classifier training")
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 
@@ -54,27 +52,36 @@ def train(sls, no_sls, random_no_sls, batch_size, lr, momentum, epochs, model_pa
             # Calculate Loss
             train_loss += loss.item()
         valid_loss = 0.0
+        val_score = 0
         net.eval()     # Optional when not using Model Specific layer
-        for data, label in val_loader:
-            data, label = data.to(device), label.to(device)
-            # Forward Pass
-            prediction = net(data)
-            # Find the Loss
-            loss = criterion(label, prediction)
-            # Calculate Loss
-            valid_loss += loss.item()
+        with torch.no_grad():
+            for data, label in val_loader:
+                data, label = data.to(device), label.to(device)
+                # Forward Pass
+                prediction = net(data)
+                # Find the Loss
+                loss = criterion(label, prediction)
+                # Calculate Loss
+                valid_loss += loss.item()
+                if prediction.max() > 0.6:
+                    if prediction.argmax() == label.argmax():
+                        val_score += 1
+                else:
+                    if label.sum().item() == 0:
+                        val_score += 1
+
         valid_score = valid_loss/len(val_loader)
         train_logs_list.append(train_loss/len(train_loader))
         valid_logs_list.append(valid_score)
         # Save model if a better val IoU score is obtained
         if valid_score <= min(valid_logs_list):
-            best_score = valid_score
             torch.save(net, model_path)
             print('Model saved!')
-        print('Epoch: {} - Loss: {:.6f} - Validation: {:.6f}'.format(epoch + 1,
+        print('Epoch: {} - Loss: {:.6f} - Validation loss: {:.6f} - Validation accuracy: {:.2f}%'.format(epoch + 1,
                                                                      train_loss /
                                                                      len(train_loader),
-                                                                     valid_loss/len(val_loader)))
+                                                                     valid_loss/len(val_loader),
+                                                                     100*val_score/len(val_loader)))
 
     plot_loss(train_logs_list, valid_logs_list)
 
