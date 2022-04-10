@@ -17,4 +17,4 @@ lr = 0.01
 momentum = 0.9
 val_size = 0.1
 img_size = 42
-model_path = "models/sls_classifier.pth"
+model_path = "weights/sls_classifier.pth"

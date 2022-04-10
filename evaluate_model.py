@@ -20,17 +20,19 @@ def test():
         T.ToPILImage(),
         T.Resize((cfg.img_size, cfg.img_size)),
         T.ToTensor()])
-    dataset = SlsDataset(cfg.test_sls, cfg.test_nosls,
-                         cfg.test_random, transform)
+    test_sls = [os.path.join(cfg.test_sls, path) for path in  os.listdir(cfg.test_sls)]
+    test_nosls = [os.path.join(cfg.test_nosls, path) for path in  os.listdir(cfg.test_nosls)]
+    test_random = [os.path.join(cfg.test_random, path) for path in  os.listdir(cfg.test_random)]
+    dataset = SlsDataset(test_sls, test_nosls,
+                         test_random, transform)
 
-    print("Test data contains ", len(dataset), "images")
     print("================== Inference ==================")
     good_predictions = 0
     total = 0
     dataloader = DataLoader(dataset, batch_size=cfg.batch_size,
-                            shuffle=True, num_workers= os.cpu_count())
+                            shuffle=True, num_workers=os.cpu_count())
     for batch in dataloader:
-        images, labels = batch["image"], batch["label"]
+        images, labels = batch
         images, labels = images.to(DEVICE), labels.to(DEVICE)
         # Forward Pass
         with torch.no_grad():
@@ -48,6 +50,7 @@ def test():
     print("done!")
     print("================== Getting metrics ==================")
     print("Accuracy : ", "%.2f" % (100*good_predictions/total), "%")
+
 
 if __name__ == "__main__":
     test()

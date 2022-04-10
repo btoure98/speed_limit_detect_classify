@@ -15,6 +15,7 @@ def hough_detector(image):
             if circle[2] != 0:
                 sign = image[max(0, circle[1] - circle[2]):circle[1] + circle[2],
                                         max(0, circle[0] - circle[2]):circle[0] + circle[2]]
+                sign = cv2.resize(sign,(cfg.img_size, cfg.img_size))
                 maybe_signs.append(sign)
     return maybe_signs
 
