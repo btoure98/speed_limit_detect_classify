@@ -21,7 +21,7 @@ def generate(img_folder, destination_folder, num_imgs):
     for image_file in os.listdir(img_folder):
         image_path = os.path.join(img_folder, image_file)
         img = cv2.imread(image_path)
-        for i in range(num_imgs//len(img_folder)):
+        for i in range(num_imgs//len(os.listdir(img_folder))):
             generated_img = random_transformations(img)
             generated_img_path = os.path.join(destination_folder, image_file.split(".")[
                                     0] + "_" + str(i) + ".jpg")

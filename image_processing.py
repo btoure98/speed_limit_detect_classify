@@ -1,5 +1,22 @@
+from tokenize import maybe
 import cv2
 import numpy as np
+import config as cfg
+
+
+def hough_detector(image):
+    maybe_signs = []
+    gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+    circles = cv2.HoughCircles(gray, cv2.HOUGH_GRADIENT, minDist=20,
+                               dp=1, param1=30, param2=60, minRadius=10, maxRadius=250)
+    if circles is not None:
+        circles = circles.astype(int)
+        for circle in circles[0, :]:
+            if circle[2] != 0:
+                sign = image[max(0, circle[1] - circle[2]):circle[1] + circle[2],
+                                        max(0, circle[0] - circle[2]):circle[0] + circle[2]]
+                maybe_signs.append(sign)
+    return maybe_signs
 
 
 def rotate_img(img):
