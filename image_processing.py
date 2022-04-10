@@ -14,8 +14,8 @@ def hough_detector(image):
         for circle in circles[0, :]:
             if circle[2] != 0:
                 sign = image[max(0, circle[1] - circle[2]):circle[1] + circle[2],
-                                        max(0, circle[0] - circle[2]):circle[0] + circle[2]]
-                sign = cv2.resize(sign,(cfg.img_size, cfg.img_size))
+                             max(0, circle[0] - circle[2]):circle[0] + circle[2]]
+                sign = cv2.resize(sign, (cfg.img_size, cfg.img_size))
                 maybe_signs.append(sign)
     return maybe_signs
 
@@ -64,8 +64,12 @@ def change_perspective(img):
     h, w, c = img.shape
     a = min(w, h)//10+1
     pts1 = np.float32([[0, 0], [w, 0], [0, h], [w, h]])
-    pts2 = np.float32([[0+np.random.randint(-a, a), 0+np.random.randint(-a, a)], [w-np.random.randint(-a, a), 0+np.random.randint(-a, a)],
-                      [0+np.random.randint(-a, a), h-np.random.randint(-a, a)], [w-np.random.randint(-a, a), h-np.random.randint(-a, a)]])
+    pts2 = np.float32([[0+np.random.randint(-a, a), 0+np.random.randint(-a, a)],
+                       [w-np.random.randint(-a, a), 0 +
+                        np.random.randint(-a, a)],
+                       [0+np.random.randint(-a, a), h -
+                        np.random.randint(-a, a)],
+                       [w-np.random.randint(-a, a), h-np.random.randint(-a, a)]])
     M = cv2.getPerspectiveTransform(pts1, pts2)
     return cv2.warpPerspective(img, M, (w, h))
 
