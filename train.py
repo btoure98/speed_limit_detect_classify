@@ -42,6 +42,17 @@ def train(sls, no_sls, random_no_sls, batch_size, lr, momentum, epochs, model_pa
     for epoch in range(epochs):
         net.train()
         train_loss = 0.0
+        for data, label in train_loader:
+            data, label = data.to(device), label.to(device)
+            opt.zero_grad()
+            # Forward Pass
+            prediction = net(data)
+            # Find the Loss
+            loss = criterion(label, prediction)
+            loss.backward()
+            opt.step()
+            # Calculate Loss
+            train_loss += loss.item()
         valid_loss = 0.0
         net.eval()     # Optional when not using Model Specific layer
         for data, label in val_loader:
