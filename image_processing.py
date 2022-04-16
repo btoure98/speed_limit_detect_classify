@@ -1,4 +1,3 @@
-from tokenize import maybe
 import cv2
 import numpy as np
 import config as cfg
